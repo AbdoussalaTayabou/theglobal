@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}Tous les articles — The Global Chronicle{% endblock %}
+{% block description %}Découvrez tous nos articles, enquêtes et analyses. Filtrez par rubrique.{% endblock %}
+
+{% block body %}
+<section class="container archive-header">
+  <div class="kicker">· Archive</div>
+  <h1>Tous les articles</h1>
+  <p class="lead">Explorez nos enquêtes, analyses et reportages. Filtrez par rubrique pour affiner votre lecture.</p>
+</section>
+
+<section class="container">
+  <div class="filter-row">
+    <form method="get" action="{{ url_for('articles_list') }}" class="search-filter-form">
+      <div class="search-bar">
+        <input type="search" name="q" value="{{ query_text or '' }}"
+               placeholder="Rechercher un article (titre, extrait, contenu)…"
+               class="search-input" />
+        <button type="submit" class="search-btn">Rechercher</button>
+      </div>
+      <div class="filters-inline">
+        <label class="filter-label">
+          Rubrique
+          <select name="category" class="filter-select" onchange="this.form.submit()">
+            <option value="">Toutes</option>
+            {% for cat in available_categories %}
+              <option value="{{ cat.slug }}" {% if current_category and current_category.id == cat.id %}selected{% endif %}>{{ cat.name }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label class="filter-label">
+          Auteur
+          <select name="author" class="filter-select" onchange="this.form.submit()">
+            <option value="">Tous</option>
+            {% for au in available_authors %}
+              <option value="{{ au }}" {% if current_author == au %}selected{% endif %}>{{ au }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        {% if query_text or current_category or current_author %}
+          <a href="{{ url_for('articles_list') }}" class="filter-btn">Réinitialiser</a>
+        {% endif %}
+      </div>
+    </form>
+  </div>
+  <div class="gold-rule"></div>
+</section>
+
+<section class="container">
+  {% if articles %}
+  <div class="grid-archive">
+    {% for a in articles %}
+    <a href="{{ url_for('article_detail', slug=a.slug) }}" class="card-link">
+      <div class="card-image"><img src="{{ a.image|img }}" alt="{{ a.title }}" /></div>
+      <div class="meta-row">
+        {% if a.category %}<span class="badge">{{ a.category.name }}</span>{% endif %}
+        <span class="muted">· {{ a.read_time }}</span>
+      </div>
+      <h3 class="card-title text-balance">{{ a.title }}</h3>
+      <p class="card-excerpt">{{ a.excerpt }}</p>
+      <div class="byline">Par <span class="author">{{ a.author }}</span> · {{ a.date_label }}</div>
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty">Aucun article ne correspond à ce filtre.</div>
+  {% endif %}
+</section>
+
+{% if total_pages > 1 %}
+<section class="container">
+  <div class="pagination">
+    {% set cat_slug = current_category.slug if current_category else None %}
+    <a href="{{ url_for('articles_list', category=cat_slug, author=current_author, q=query_text, page=page-1) }}"
+       class="page-btn {% if page <= 1 %}disabled{% endif %}">‹ Précédent</a>
+    {% for p in range(1, total_pages + 1) %}
+    <a href="{{ url_for('articles_list', category=cat_slug, author=current_author, q=query_text, page=p) }}"
+       class="page-num {% if p == page %}current{% endif %}">{{ p }}</a>
+    {% endfor %}
+    <a href="{{ url_for('articles_list', category=cat_slug, author=current_author, q=query_text, page=page+1) }}"
+       class="page-btn {% if page >= total_pages %}disabled{% endif %}">Suivant ›</a>
+  </div>
+</section>
+{% endif %}
+
+{% include "_footer.html" %}
+{% endblock %}

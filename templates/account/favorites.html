@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Mes favoris — {{ site_name }}{% endblock %}
+{% block body %}
+<main class="container" style="padding:60px 20px;">
+  <h1 style="font-family:'Playfair Display',serif;">Mes favoris</h1>
+  {% if not articles %}
+    <p>Aucun favori pour l'instant. Parcourez les <a href="{{ url_for('articles_list') }}">articles</a>.</p>
+  {% else %}
+    <div class="related-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:24px;margin-top:30px;">
+      {% for a in articles %}
+      <a href="{{ url_for('article_detail', slug=a.slug) }}" class="card-link" style="text-decoration:none;color:inherit;">
+        <div class="card-image"><img src="{{ a.image|img }}" alt="{{ a.title }}" style="width:100%;aspect-ratio:16/10;object-fit:cover;"></div>
+        <div style="padding:10px 0;">
+          {% if a.category %}<span class="badge" style="color:#7a1f2b;font-size:.8rem;">{{ a.category.name }}</span>{% endif %}
+          <h3 style="font-family:'Playfair Display',serif;margin:.3em 0;">{{ a.title }}</h3>
+          <p style="color:#555;font-size:.9rem;">{{ a.excerpt }}</p>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  {% endif %}
+</main>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Mon compte — {{ site_name }}{% endblock %}
+{% block body %}
+<main class="container" style="max-width:800px;padding:60px 20px;">
+  <h1 style="font-family:'Playfair Display',serif;">Bonjour {{ current_user.username }}</h1>
+  <p>Email : {{ current_user.email or "—" }}</p>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;margin-top:30px;">
+    <a href="{{ url_for('account.favorites') }}" style="padding:24px;background:#f4f4f0;border-left:4px solid #C9A84C;text-decoration:none;color:#0A1628;">
+      <div style="font-size:2rem;font-weight:700;">{{ fav_count }}</div>
+      <div>Articles favoris</div>
+    </a>
+  </div>
+  <form method="post" action="{{ url_for('auth.logout') }}" style="margin-top:40px;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button class="btn-gold" type="submit">Se déconnecter</button>
+  </form>
+</main>
+{% endblock %}

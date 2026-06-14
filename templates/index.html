@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% block title %}The Global Chronicle — The Voice of Global Press{% endblock %}
+{% block description %}Actualité internationale en continu, enquêtes, analyses et reportages.{% endblock %}
+
+{% block body %}
+
+<main class="lm-main container">
+
+  {# ============= À LA UNE : grand bloc gauche + colonnes ============= #}
+  <section class="une-grid">
+    {% if featured %}
+    <article class="une-lead">
+      <a href="{{ url_for('article_detail', slug=featured.slug) }}" class="card-link">
+        <div class="une-lead-img">
+          <img src="{{ featured.image|img }}" alt="{{ featured.title }}" />
+          {% if featured.category %}<span class="cat-tag">{{ featured.category.name }}</span>{% endif %}
+        </div>
+        <div class="une-lead-body">
+          <h1 class="une-title text-balance">{{ featured.title }}</h1>
+          <p class="une-excerpt">{{ featured.excerpt }}</p>
+          <div class="byline">Par <span class="author">{{ featured.author }}</span> · {{ featured.date_label }} · {{ featured.read_time }}</div>
+        </div>
+      </a>
+    </article>
+    {% endif %}
+
+    <aside class="une-side">
+      <div class="une-side-head">
+        <span class="live-dot"></span><span>L'essentiel</span>
+      </div>
+      <ul class="headline-list">
+        {% for a in sidebar %}
+        <li>
+          <a href="{{ url_for('article_detail', slug=a.slug) }}">
+            {% if a.category %}<span class="cat-mini">{{ a.category.name }}</span>{% endif %}
+            <h3>{{ a.title }}</h3>
+            <span class="meta-mini">{{ a.date_label }} · {{ a.read_time }}</span>
+          </a>
+        </li>
+        {% endfor %}
+      </ul>
+    </aside>
+  </section>
+
+  {# ============= Bande "En continu" ============= #}
+  {% if articles and articles|length > 5 %}
+  <section class="continu-block">
+    <div class="block-head">
+      <h2 class="block-title"><span class="title-rule"></span>En continu</h2>
+      <a href="{{ url_for('articles_list') }}" class="block-more">Toute l'actualité →</a>
+    </div>
+    <ul class="continu-list">
+      {% for a in articles[5:9] %}
+      <li>
+        <a href="{{ url_for('article_detail', slug=a.slug) }}">
+          <span class="continu-time">{{ a.date_label }}</span>
+          {% if a.category %}<span class="cat-mini gold">{{ a.category.name }}</span>{% endif %}
+          <span class="continu-title">{{ a.title }}</span>
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+
+  {# ============= Sections par rubrique ============= #}
+  {% if sections %}
+  {% for sec in sections %}
+  <section class="rubric-block">
+    <div class="block-head">
+      <h2 class="block-title"><span class="title-rule"></span>{{ sec.name }}</h2>
+      <a href="{{ url_for('articles_list', category=sec.slug) }}" class="block-more">Tous les articles {{ sec.name }} →</a>
+    </div>
+    <div class="rubric-grid">
+      {% set first = sec.articles[0] %}
+      <article class="rubric-feature">
+        <a href="{{ url_for('article_detail', slug=first.slug) }}" class="card-link">
+          <div class="card-image"><img src="{{ first.image|img }}" alt="{{ first.title }}" /></div>
+          <h3 class="card-title text-balance">{{ first.title }}</h3>
+          <p class="card-excerpt">{{ first.excerpt }}</p>
+          <div class="byline">Par <span class="author">{{ first.author }}</span> · {{ first.read_time }}</div>
+        </a>
+      </article>
+      <ul class="rubric-side">
+        {% for a in sec.articles[1:4] %}
+        <li>
+          <a href="{{ url_for('article_detail', slug=a.slug) }}">
+            <div class="rubric-side-img"><img src="{{ a.image|img }}" alt="{{ a.title }}" /></div>
+            <div>
+              <h4>{{ a.title }}</h4>
+              <span class="meta-mini">{{ a.author }} · {{ a.read_time }}</span>
+            </div>
+          </a>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </section>
+  {% endfor %}
+  {% endif %}
+
+  {# ============= Opinions / Newsletter ============= #}
+  <section class="dual-block">
+    <div class="opinions">
+      <div class="block-head"><h2 class="block-title"><span class="title-rule"></span>Édito & Opinions</h2></div>
+      <ul class="opinion-list">
+        {% for a in articles[:3] %}
+        <li>
+          <a href="{{ url_for('article_detail', slug=a.slug) }}">
+            <span class="op-kind">Tribune</span>
+            <h3>{{ a.title }}</h3>
+            <span class="op-author">{{ a.author }}</span>
+          </a>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div id="subscribe" class="newsletter-card">
+      <span class="kicker">· Newsletter</span>
+      <h3>Recevez l'essentiel chaque matin</h3>
+      <p>L'actualité décryptée par notre rédaction, livrée à 7h dans votre boîte mail.</p>
+      <form class="subscribe-form" onsubmit="event.preventDefault();">
+        <input type="email" required placeholder="votre@email.com" />
+        <button class="btn-gold" type="submit">S'abonner</button>
+      </form>
+      <div class="subscribe-footnote">1€ le premier mois · Sans engagement</div>
+    </div>
+  </section>
+
+  {% if not articles %}
+  <div class="empty">Aucun article publié pour le moment. Connectez-vous à <a href="/admin">/admin</a> pour en créer.</div>
+  {% endif %}
+
+</main>
+
+{% include "_footer.html" %}
+{% endblock %}

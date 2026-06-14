@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+{% block title %}{{ article.title }} — {{ site_name }}{% endblock %}
+{% block description %}{{ article.meta_description or article.excerpt }}{% endblock %}
+
+{% block og %}
+<meta property="og:type" content="article">
+<meta property="og:title" content="{{ article.title }}">
+<meta property="og:description" content="{{ article.meta_description or article.excerpt }}">
+<meta property="og:url" content="{{ url_for('article_detail', slug=article.slug, _external=True) }}">
+<meta property="og:image" content="{{ article.og_image or article.image or url_for('static', filename='images/hero-newsroom.jpg', _external=True) }}">
+<meta property="article:published_time" content="{{ (article.published_at or article.created_at).isoformat() }}">
+<meta property="article:modified_time" content="{{ (article.updated_at or article.created_at).isoformat() }}">
+{% if article.category %}<meta property="article:section" content="{{ article.category.name }}">{% endif %}
+{% for t in article.tags %}<meta property="article:tag" content="{{ t.name }}">{% endfor %}
+<meta property="article:author" content="{{ article.author_obj.name if article.author_obj else article.author }}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ article.title }}">
+<meta name="twitter:description" content="{{ article.meta_description or article.excerpt }}">
+<meta name="twitter:image" content="{{ article.og_image or article.image or url_for('static', filename='images/hero-newsroom.jpg', _external=True) }}">
+{% endblock %}
+
+{% block head_extra %}
+<script type="application/ld+json">{{ ld_json|safe }}</script>
+{% endblock %}
+
+{% block body %}
+<article class="article-hero">
+  {% if article.category %}<div class="article-cat">· {{ article.category.name }}</div>{% endif %}
+  <h1 class="article-title text-balance">{{ article.title }}</h1>
+  <p class="article-subtitle text-balance">{{ article.excerpt }}</p>
+  <div class="article-meta">
+    <div>
+      {% if article.author_obj %}
+        <div class="author"><a href="{{ url_for('author_detail', slug=article.author_obj.slug) }}" style="color:inherit;text-decoration:none;border-bottom:1px solid #C9A84C;">{{ article.author_obj.name }}</a></div>
+        <div class="role">{{ article.author_obj.role }}</div>
+      {% else %}
+        <div class="author">{{ article.author }}</div>
+        <div class="role">{{ article.author_role }}</div>
+      {% endif %}
+    </div>
+    <div class="date">
+      {{ article.date_label or (article.published_at or article.created_at).strftime('%d/%m/%Y') }} · {{ article.read_time }}
+      {% if article.views %} · {{ article.views }} vues{% endif %}
+    </div>
+  </div>
+
+  {# Favori #}
+  <div style="margin-top:14px;">
+    {% if current_user.is_authenticated %}
+      <form method="post" action="{{ url_for('account.toggle_favorite', article_id=article.id) }}" style="display:inline;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="next" value="{{ request.path }}">
+        <button class="btn-gold" type="submit" style="background:transparent;border:1px solid #C9A84C;color:#0A1628;">
+          {% if article.id in fav_ids %}★ Retirer des favoris{% else %}☆ Ajouter aux favoris{% endif %}
+        </button>
+      </form>
+    {% else %}
+      <a href="{{ url_for('auth.login', next=request.path) }}" style="font-size:.9rem;color:#7a1f2b;">☆ Connectez-vous pour ajouter aux favoris</a>
+    {% endif %}
+  </div>
+
+  {# Tags #}
+  {% if article.tags %}
+  <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;">
+    {% for t in article.tags %}
+      <a href="{{ url_for('tag_detail', slug=t.slug) }}" style="font-size:.8rem;padding:4px 10px;background:#f4f4f0;color:#0A1628;text-decoration:none;border-radius:2px;">#{{ t.name }}</a>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {# Partage natif (Web Share API + fallbacks) #}
+  <div style="margin-top:18px;"
+       data-share
+       data-url="{{ url_for('article_detail', slug=article.slug, _external=True) }}"
+       data-title="{{ article.title }}"
+       data-text="{{ article.excerpt or '' }}"></div>
+</article>
+
+<figure class="article-cover">
+  <img src="{{ article.image|img }}" alt="{{ article.title }}" />
+  <figcaption>{{ article.image_caption }}{% if article.image_credit %} · © {{ article.image_credit }}{% endif %}</figcaption>
+</figure>
+
+<div class="article-body">
+  {{ article.content|safe }}
+
+  {% if article.media %}
+  <section class="article-media" style="margin:40px 0;display:grid;gap:24px;">
+    {% for m in article.media %}
+      {% if m.kind == 'image' %}
+        <figure style="margin:0;">
+          <img src="{{ m.url|img }}" alt="{{ m.caption or article.title }}" style="width:100%;display:block;" />
+          {% if m.caption %}<figcaption style="font-size:.85rem;color:#666;margin-top:6px;text-align:center;">{{ m.caption }}</figcaption>{% endif %}
+        </figure>
+      {% elif m.kind == 'video' %}
+        <video src="{{ m.url }}" controls style="width:100%;display:block;background:#000;"></video>
+      {% elif m.kind == 'embed' %}
+        <div style="position:relative;aspect-ratio:16/9;">
+          <iframe src="{{ m.url|replace('watch?v=','embed/')|replace('youtu.be/','www.youtube.com/embed/') }}"
+                  style="position:absolute;inset:0;width:100%;height:100%;border:0;"
+                  allowfullscreen></iframe>
+        </div>
+      {% endif %}
+    {% endfor %}
+  </section>
+  {% endif %}
+
+  {% if article.pdfs %}
+  <section class="article-pdfs" style="margin:40px 0;padding:24px;background:#f4f4f0;border-left:4px solid #C9A84C;">
+    <h3 style="font-family:'Playfair Display',serif;margin:0 0 14px;color:#0A1628;">Documents à télécharger</h3>
+    <ul style="list-style:none;padding:0;margin:0;display:grid;gap:10px;">
+      {% for p in article.pdfs %}
+      <li style="display:flex;align-items:center;gap:12px;">
+        <span style="font-size:1.4rem;">📄</span>
+        <a href="{{ p.url }}" download style="color:#0A1628;font-weight:600;text-decoration:none;border-bottom:1px solid #C9A84C;">{{ p.title }}</a>
+      </li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+
+  {# Sondage du jour #}
+  {% include "_poll.html" %}
+
+  <div class="gold-rule my-12"></div>
+
+  {# ----------------- Commentaires ----------------- #}
+  <section id="commentaires" style="margin:50px 0;">
+    <div class="kicker">· Discussion</div>
+    <h2 class="section-title" style="margin-bottom:20px;">Commentaires ({{ comments|length }})</h2>
+
+    {% for c in comments %}
+      <div style="padding:16px 0;border-bottom:1px solid #eee;">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;">
+          <strong>{{ c.author_name }}</strong>
+          <span style="font-size:.8rem;color:#888;">{{ c.created_at.strftime('%d/%m/%Y %H:%M') }}</span>
+        </div>
+        <div style="margin-top:8px;line-height:1.55;">{{ c.content|safe }}</div>
+      </div>
+    {% else %}
+      <p style="color:#777;">Soyez le premier à commenter.</p>
+    {% endfor %}
+
+    <form method="post" action="{{ url_for('comments.post', article_id=article.id) }}"
+          style="margin-top:30px;display:grid;gap:12px;max-width:680px;">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <h3 style="font-family:'Playfair Display',serif;margin:0;">Laisser un commentaire</h3>
+      {% if not current_user.is_authenticated %}
+        <input type="text" name="name" placeholder="Nom" required maxlength="120" style="padding:10px;border:1px solid #ccc;">
+        <input type="email" name="email" placeholder="Email (non publié)" required style="padding:10px;border:1px solid #ccc;">
+      {% endif %}
+      <textarea name="content" required minlength="5" maxlength="4000" rows="5" placeholder="Votre message…" style="padding:10px;border:1px solid #ccc;"></textarea>
+      {# Honeypot anti-bot #}
+      <input type="text" name="website" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;" aria-hidden="true">
+      <p style="font-size:.8rem;color:#888;margin:0;">Votre commentaire sera publié après modération.</p>
+      <button class="btn-gold lg" type="submit">Publier</button>
+    </form>
+  </section>
+
+  <div class="article-cta">
+    <div class="kicker">· Soutenez notre rédaction</div>
+    <p>Un journalisme indépendant, accessible à tous.</p>
+    <a href="#newsletter" class="btn-gold lg">Recevoir la newsletter</a>
+    <button type="button" class="btn-gold lg" data-push-subscribe data-topic="breaking"
+            style="margin-left:8px;background:transparent;border:1px solid #C9A84C;color:#0A1628;">
+      🔔 Activer les alertes
+    </button>
+  </div>
+</div>
+
+{% if related %}
+<section class="related-section">
+  <div class="container">
+    <div class="kicker">· À lire aussi</div>
+    <h2 class="section-title" style="margin-bottom:40px;">Autres articles</h2>
+    <div class="related-grid">
+      {% for a in related %}
+      <a href="{{ url_for('article_detail', slug=a.slug) }}" class="card-link">
+        <div class="card-image"><img src="{{ a.image|img }}" alt="{{ a.title }}" /></div>
+        <div class="meta-row">{% if a.category %}<span class="badge">{{ a.category.name }}</span>{% endif %}</div>
+        <h3 class="card-title text-balance">{{ a.title }}</h3>
+        <div class="byline">Par <span class="author">{{ a.author }}</span></div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+{% endblock %}

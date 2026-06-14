@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Connexion — {{ site_name }}{% endblock %}
+{% block body %}
+<main class="container" style="max-width:480px;padding:60px 20px;">
+  <h1 style="font-family:'Playfair Display',serif;">Se connecter</h1>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for cat,m in messages %}<div class="flash {{cat}}" style="padding:10px;margin:10px 0;background:#f4f4f0;border-left:4px solid #C9A84C;">{{m}}</div>{% endfor %}
+  {% endwith %}
+  <form method="post" style="display:grid;gap:14px;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label>Pseudo ou email
+      <input type="text" name="identifier" required style="width:100%;padding:10px;border:1px solid #ccc;">
+    </label>
+    <label>Mot de passe
+      <input type="password" name="password" required style="width:100%;padding:10px;border:1px solid #ccc;">
+    </label>
+    <label><input type="checkbox" name="remember"> Se souvenir de moi</label>
+    <button class="btn-gold lg" type="submit">Se connecter</button>
+  </form>
+  <p style="margin-top:20px;">Pas de compte ? <a href="{{ url_for('auth.signup') }}">Créer un compte</a></p>
+</main>
+{% endblock %}

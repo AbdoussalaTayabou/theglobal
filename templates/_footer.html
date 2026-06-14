@@ -1,0 +1,31 @@
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <div class="footer-cols">
+      <div>
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="The Global Chronicle" />
+        <p>The Voice of Global Press. Information indépendante depuis 2026.</p>
+      </div>
+      <div>
+        <h4>Rubriques</h4>
+        <ul>{% for c in categories[:5] %}<li><a href="{{ url_for('articles_list', category=c) }}">{{ c }}</a></li>{% endfor %}</ul>
+      </div>
+      <div>
+        <h4>Le journal</h4>
+        <ul>{% for l in ['À propos','Notre charte','Rédaction','Contact','Presse'] %}<li><a href="#">{{ l }}</a></li>{% endfor %}</ul>
+      </div>
+      <div>
+        <h4>Services</h4>
+        <ul>{% for l in ["S'abonner",'Newsletters','Podcasts','Archives','App mobile'] %}<li><a href="#">{{ l }}</a></li>{% endfor %}</ul>
+      </div>
+    </div>
+    <div class="gold-rule" style="margin-bottom:24px;"></div>
+    <div class="footer-bottom">
+      <div>© 2026 The Global Chronicle · Tous droits réservés</div>
+      <div class="links">
+        <a href="#">Mentions légales</a>
+        <a href="#">Confidentialité</a>
+        <a href="#">Cookies</a>
+      </div>
+    </div>
+  </div>
+</footer>

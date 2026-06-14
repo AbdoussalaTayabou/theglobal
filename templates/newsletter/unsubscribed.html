@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Désinscription — {{ site_name }}{% endblock %}
+{% block body %}
+<main class="container" style="max-width:600px;padding:80px 20px;text-align:center;">
+  <h1 style="font-family:'Playfair Display',serif;">Vous êtes désinscrit·e</h1>
+  <p>Vous ne recevrez plus nos newsletters.</p>
+  <p><a href="{{ url_for('index') }}">Retour à l'accueil</a></p>
+</main>
+{% endblock %}

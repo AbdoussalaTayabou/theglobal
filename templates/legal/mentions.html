@@ -1,0 +1,56 @@
+{% extends "legal/_layout.html" %}
+{% set title = "Mentions légales" %}
+{% set description = "Mentions légales de The Global Chronicle : éditeur, hébergeur, propriété intellectuelle." %}
+{% block legal_body %}
+<p><em>Dernière mise à jour : {{ current_year }}.</em></p>
+
+<h2>1. Éditeur du site</h2>
+<p>
+  Le site <strong>{{ site_name }}</strong> (ci-après « le Site ») est édité par :<br>
+  <strong>[Raison sociale / Nom du directeur de publication]</strong><br>
+  Adresse : [Adresse postale complète]<br>
+  Téléphone : [+33 X XX XX XX XX]<br>
+  Email : <a href="mailto:contact@example.com">contact@example.com</a><br>
+  SIRET : [Numéro SIRET] — RCS : [Ville et numéro]<br>
+  Numéro de TVA intracommunautaire : [FRXX XXXXXXXXX]<br>
+  Directeur de la publication : [Nom Prénom]
+</p>
+
+<h2>2. Hébergeur</h2>
+<p>
+  Le Site est hébergé par :<br>
+  <strong>[Nom de l'hébergeur]</strong> — [Adresse de l'hébergeur] — Téléphone : [+XX XXX XXX XXX]
+</p>
+
+<h2>3. Propriété intellectuelle</h2>
+<p>
+  L'ensemble des contenus du Site (textes, images, vidéos, logos, charte graphique, code source)
+  est protégé par le droit d'auteur et reste la propriété exclusive de {{ site_name }} ou de ses
+  partenaires. Toute reproduction, représentation, modification, publication, transmission, totale
+  ou partielle du Site ou de son contenu, par quelque procédé que ce soit, sans l'autorisation
+  expresse et préalable de {{ site_name }}, est interdite et constitue une contrefaçon
+  sanctionnée par les articles L.335-2 et suivants du Code de la propriété intellectuelle.
+</p>
+
+<h2>4. Responsabilité</h2>
+<p>
+  {{ site_name }} s'efforce d'assurer l'exactitude et la mise à jour des informations diffusées sur
+  le Site, mais ne peut garantir l'absence d'erreurs ou d'omissions. L'utilisateur reconnaît
+  utiliser ces informations sous sa responsabilité exclusive.
+</p>
+
+<h2>5. Liens hypertextes</h2>
+<p>
+  Le Site peut contenir des liens vers des sites tiers. {{ site_name }} n'exerce aucun contrôle sur
+  ces sites et décline toute responsabilité quant à leur contenu.
+</p>
+
+<h2>6. Droit applicable</h2>
+<p>
+  Les présentes mentions légales sont régies par le droit français. En cas de litige, les
+  tribunaux français seront seuls compétents.
+</p>
+
+<h2>7. Contact</h2>
+<p>Pour toute question : <a href="{{ url_for('legal.contact') }}">page contact</a>.</p>
+{% endblock %}

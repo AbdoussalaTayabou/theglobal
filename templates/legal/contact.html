@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}Contact — {{ site_name }}{% endblock %}
+{% block description %}Contactez la rédaction de The Global Chronicle.{% endblock %}
+{% block content %}
+<section class="container" style="max-width:760px;margin:60px auto;padding:0 20px;">
+  <h1 style="font-family:'Playfair Display',serif;font-size:2.6rem;margin-bottom:8px;">Nous contacter</h1>
+  <div style="height:3px;width:64px;background:#C9A84C;margin:0 0 18px;"></div>
+  <p style="color:#555;margin-bottom:28px;">
+    Une question, une suggestion, un signalement ? Écrivez-nous via le formulaire ci-dessous.
+    Nous répondons sous 72h en moyenne.
+  </p>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for cat, msg in messages %}
+      <div style="padding:12px 16px;margin-bottom:14px;border-radius:6px;
+        background:{{ '#e8f6ee' if cat=='success' else '#fdecea' }};
+        color:{{ '#1e6b3a' if cat=='success' else '#a32020' }};
+        border:1px solid {{ '#bfe3cc' if cat=='success' else '#f5c6c2' }};">
+        {{ msg }}
+      </div>
+    {% endfor %}
+  {% endwith %}
+
+  <form method="post" action="{{ url_for('legal.contact') }}" novalidate
+        style="display:flex;flex-direction:column;gap:14px;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <!-- Honeypot -->
+    <input type="text" name="website" tabindex="-1" autocomplete="off"
+           style="position:absolute;left:-9999px;" aria-hidden="true">
+
+    <label style="display:flex;flex-direction:column;gap:6px;font-weight:600;">
+      Nom complet *
+      <input type="text" name="name" required minlength="2" maxlength="120"
+             value="{{ form.name or '' }}"
+             style="padding:12px;border:1px solid #ccc;border-radius:6px;font-size:1rem;">
+    </label>
+
+    <label style="display:flex;flex-direction:column;gap:6px;font-weight:600;">
+      Email *
+      <input type="email" name="email" required maxlength="200"
+             value="{{ form.email or '' }}"
+             style="padding:12px;border:1px solid #ccc;border-radius:6px;font-size:1rem;">
+    </label>
+
+    <label style="display:flex;flex-direction:column;gap:6px;font-weight:600;">
+      Sujet *
+      <input type="text" name="subject" required minlength="3" maxlength="200"
+             value="{{ form.subject or '' }}"
+             style="padding:12px;border:1px solid #ccc;border-radius:6px;font-size:1rem;">
+    </label>
+
+    <label style="display:flex;flex-direction:column;gap:6px;font-weight:600;">
+      Message *
+      <textarea name="message" required minlength="10" maxlength="5000" rows="8"
+                style="padding:12px;border:1px solid #ccc;border-radius:6px;font-size:1rem;font-family:inherit;">{{ form.message or '' }}</textarea>
+    </label>
+
+    <p style="font-size:.85rem;color:#666;">
+      En envoyant ce message, vous acceptez notre
+      <a href="{{ url_for('legal.privacy') }}" style="color:#C9A84C;">politique de confidentialité</a>.
+      Vos données ne sont utilisées que pour traiter votre demande.
+    </p>
+
+    <button type="submit" class="btn-gold lg"
+            style="padding:14px 28px;background:#C9A84C;color:#0A1628;border:none;
+                   font-weight:700;font-size:1rem;cursor:pointer;border-radius:6px;align-self:flex-start;">
+      Envoyer le message
+    </button>
+  </form>
+</section>
+{% endblock %}

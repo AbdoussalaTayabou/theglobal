@@ -1,0 +1,71 @@
+{# Partial : sondage / question du jour
+   Variables attendues : poll (Poll ou None), poll_voted (bool) #}
+{% if poll %}
+<section class="poll-box" id="poll-{{ poll.id }}"
+         style="margin:40px 0;padding:24px;background:#fff;border:1px solid #e5e1d6;border-left:4px solid #C9A84C;">
+  <div class="kicker">· Question du jour</div>
+  <h3 style="font-family:'Playfair Display',serif;color:#0A1628;margin:8px 0 16px;">{{ poll.question }}</h3>
+
+  <div class="poll-options" style="display:grid;gap:8px;">
+    {% set total = poll.total_votes or 0 %}
+    {% for o in poll.options %}
+      {% set pct = ((o.votes or 0) * 100 / total) if total else 0 %}
+      <div class="poll-opt" data-opt="{{ o.id }}">
+        {% if poll_voted %}
+          <div style="position:relative;padding:10px 12px;background:#f6f4ec;border:1px solid #e5e1d6;overflow:hidden;">
+            <div style="position:absolute;inset:0;width:{{ pct }}%;background:#C9A84C22;"></div>
+            <div style="position:relative;display:flex;justify-content:space-between;">
+              <span>{{ o.label }}</span>
+              <strong>{{ '%.0f'|format(pct) }}% · {{ o.votes or 0 }}</strong>
+            </div>
+          </div>
+        {% else %}
+          <button type="button" data-poll-vote
+                  data-poll="{{ poll.id }}" data-opt="{{ o.id }}"
+                  style="width:100%;text-align:left;padding:10px 12px;background:#f6f4ec;border:1px solid #e5e1d6;cursor:pointer;font-family:inherit;">
+            {{ o.label }}
+          </button>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+  <p class="poll-total" style="font-size:.8rem;color:#888;margin-top:10px;">
+    {{ poll.total_votes or 0 }} vote{{ 's' if (poll.total_votes or 0) > 1 else '' }}
+  </p>
+</section>
+
+<script>
+(function () {
+  const box = document.getElementById('poll-{{ poll.id }}');
+  if (!box) return;
+  const csrf = document.querySelector('meta[name="csrf-token"]')?.content || '';
+  box.querySelectorAll('[data-poll-vote]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const pollId = btn.dataset.poll, optId = btn.dataset.opt;
+      btn.disabled = true;
+      try {
+        const r = await fetch(`/sondage/${pollId}/vote/${optId}`, {
+          method: 'POST',
+          headers: { 'X-CSRFToken': csrf },
+        });
+        const data = await r.json();
+        renderResults(data);
+      } catch (e) { btn.disabled = false; }
+    });
+  });
+  function renderResults(data) {
+    const opts = box.querySelector('.poll-options');
+    opts.innerHTML = data.options.map(o => `
+      <div class="poll-opt">
+        <div style="position:relative;padding:10px 12px;background:#f6f4ec;border:1px solid #e5e1d6;overflow:hidden;">
+          <div style="position:absolute;inset:0;width:${o.pct}%;background:#C9A84C22;"></div>
+          <div style="position:relative;display:flex;justify-content:space-between;">
+            <span>${o.label}</span><strong>${o.pct}% · ${o.votes}</strong>
+          </div>
+        </div>
+      </div>`).join('');
+    box.querySelector('.poll-total').textContent = `${data.total} vote${data.total > 1 ? 's' : ''}${data.already_voted ? ' · vous avez déjà voté' : ''}`;
+  }
+})();
+</script>
+{% endif %}

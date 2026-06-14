@@ -1,0 +1,15 @@
+{% extends "admin/master.html" %}
+{% block body %}
+<div style="padding:30px;">
+  <h2 style="font-family:'Playfair Display',serif;">Tableau de bord</h2>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:20px;margin-top:20px;">
+    <div style="padding:18px;background:#fff;border-left:4px solid #C9A84C;"><div style="font-size:2rem;font-weight:700;">{{ stats.articles }}</div><div>Articles</div></div>
+    <div style="padding:18px;background:#fff;border-left:4px solid #0c6e4d;"><div style="font-size:2rem;font-weight:700;">{{ stats.published }}</div><div>Publiés</div></div>
+    <div style="padding:18px;background:#fff;border-left:4px solid #7a5a1f;"><div style="font-size:2rem;font-weight:700;">{{ stats.drafts }}</div><div>Brouillons</div></div>
+    <div style="padding:18px;background:#fff;border-left:4px solid #1f4e8c;"><div style="font-size:2rem;font-weight:700;">{{ stats.scheduled }}</div><div>Programmés</div></div>
+    <div style="padding:18px;background:#fff;border-left:4px solid #c0392b;"><div style="font-size:2rem;font-weight:700;">{{ stats.pending_comments }}</div><div>Comm. à modérer</div></div>
+    <div style="padding:18px;background:#fff;border-left:4px solid #2f7a3a;"><div style="font-size:2rem;font-weight:700;">{{ stats.subscribers }}</div><div>Abonnés newsletter</div></div>
+    <div style="padding:18px;background:#fff;border-left:4px solid #555;"><div style="font-size:2rem;font-weight:700;">{{ stats.users }}</div><div>Utilisateurs</div></div>
+  </div>
+</div>
+{% endblock %}

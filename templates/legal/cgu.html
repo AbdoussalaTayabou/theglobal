@@ -1,0 +1,71 @@
+{% extends "legal/_layout.html" %}
+{% set title = "Conditions Générales d'Utilisation" %}
+{% set description = "Conditions générales d'utilisation du site The Global Chronicle." %}
+{% block legal_body %}
+<p><em>Dernière mise à jour : {{ current_year }}.</em></p>
+
+<h2>1. Objet</h2>
+<p>
+  Les présentes Conditions Générales d'Utilisation (« CGU ») régissent l'accès et l'utilisation
+  du site <strong>{{ site_name }}</strong>. En accédant au Site, l'utilisateur reconnaît avoir lu
+  et accepté sans réserve les présentes CGU.
+</p>
+
+<h2>2. Accès au service</h2>
+<p>
+  Le Site est accessible gratuitement. {{ site_name }} se réserve le droit, sans préavis,
+  d'interrompre, suspendre ou modifier l'accès à tout ou partie du service pour des raisons
+  techniques, légales ou éditoriales.
+</p>
+
+<h2>3. Compte utilisateur</h2>
+<ul>
+  <li>L'inscription est ouverte aux personnes majeures ou mineurs avec autorisation parentale.</li>
+  <li>L'utilisateur s'engage à fournir des informations exactes et à les maintenir à jour.</li>
+  <li>L'utilisateur est seul responsable de la confidentialité de ses identifiants.</li>
+  <li>Toute activité réalisée depuis le compte est réputée être le fait du titulaire.</li>
+</ul>
+
+<h2>4. Règles de publication (commentaires)</h2>
+<p>L'utilisateur s'engage à ne pas publier de contenus :</p>
+<ul>
+  <li>Illicites, injurieux, diffamatoires, haineux, racistes ou discriminatoires.</li>
+  <li>Faisant l'apologie de crimes ou de violences.</li>
+  <li>Portant atteinte à la vie privée ou aux droits d'autrui.</li>
+  <li>Contrefaisants ou enfreignant un droit de propriété intellectuelle.</li>
+  <li>Publicitaires, spam, liens malveillants.</li>
+</ul>
+<p>
+  {{ site_name }} se réserve le droit de modérer, modifier ou supprimer tout contenu non conforme,
+  et de suspendre ou supprimer le compte d'un utilisateur en cas de manquement.
+</p>
+
+<h2>5. Propriété intellectuelle</h2>
+<p>
+  Voir les <a href="{{ url_for('legal.mentions') }}">mentions légales</a>. En publiant un
+  commentaire, l'utilisateur concède à {{ site_name }} une licence non exclusive et gratuite pour
+  l'afficher sur le Site.
+</p>
+
+<h2>6. Responsabilité</h2>
+<p>
+  {{ site_name }} ne saurait être tenu responsable des dommages directs ou indirects résultant
+  de l'utilisation du Site, notamment en cas d'interruption, de bug, de virus ou de perte de
+  données.
+</p>
+
+<h2>7. Données personnelles</h2>
+<p>Voir la <a href="{{ url_for('legal.privacy') }}">politique de confidentialité</a>.</p>
+
+<h2>8. Modification des CGU</h2>
+<p>
+  {{ site_name }} peut modifier les présentes CGU à tout moment. Les utilisateurs sont informés
+  de toute modification substantielle.
+</p>
+
+<h2>9. Droit applicable et juridiction</h2>
+<p>
+  Les présentes CGU sont régies par le droit français. Tout litige relèvera de la compétence
+  exclusive des tribunaux français.
+</p>
+{% endblock %}

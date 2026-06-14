@@ -1,0 +1,89 @@
+{% extends "legal/_layout.html" %}
+{% set title = "Politique de confidentialité" %}
+{% set description = "Comment The Global Chronicle collecte, utilise et protège vos données personnelles (RGPD)." %}
+{% block legal_body %}
+<p><em>Dernière mise à jour : {{ current_year }}.</em></p>
+
+<p>
+  La présente politique décrit la manière dont <strong>{{ site_name }}</strong> collecte, utilise et
+  protège vos données personnelles, conformément au Règlement Général sur la Protection des
+  Données (RGPD) et à la loi « Informatique et Libertés ».
+</p>
+
+<h2>1. Responsable du traitement</h2>
+<p>
+  Le responsable du traitement est <strong>[Raison sociale]</strong> — contact :
+  <a href="mailto:contact@example.com">contact@example.com</a>.
+</p>
+
+<h2>2. Données collectées</h2>
+<ul>
+  <li><strong>Compte utilisateur</strong> : nom d'utilisateur, email, mot de passe (haché).</li>
+  <li><strong>Commentaires</strong> : pseudo, contenu, date, adresse IP (modération anti-spam).</li>
+  <li><strong>Newsletter</strong> : email, date d'inscription, statut de confirmation.</li>
+  <li><strong>Contact</strong> : nom, email, sujet, message.</li>
+  <li><strong>Données techniques</strong> : adresse IP, user-agent, pages consultées (logs serveur, conservation 12 mois max).</li>
+</ul>
+
+<h2>3. Finalités</h2>
+<ul>
+  <li>Gestion du compte et authentification.</li>
+  <li>Publication et modération de commentaires.</li>
+  <li>Envoi de la newsletter (avec votre consentement, double opt-in).</li>
+  <li>Réponse aux demandes via le formulaire de contact.</li>
+  <li>Sécurité du site (prévention des abus, lutte anti-spam).</li>
+  <li>Mesure d'audience anonyme.</li>
+</ul>
+
+<h2>4. Bases légales</h2>
+<ul>
+  <li>Exécution du service (compte, commentaires).</li>
+  <li>Consentement (newsletter, cookies non essentiels).</li>
+  <li>Intérêt légitime (sécurité, statistiques anonymisées).</li>
+</ul>
+
+<h2>5. Durées de conservation</h2>
+<ul>
+  <li>Compte : tant que le compte est actif, puis suppression sur demande.</li>
+  <li>Commentaires : tant que l'article reste publié.</li>
+  <li>Newsletter : jusqu'à désinscription.</li>
+  <li>Messages contact : 3 ans maximum.</li>
+  <li>Logs techniques : 12 mois maximum.</li>
+</ul>
+
+<h2>6. Destinataires</h2>
+<p>
+  Vos données ne sont jamais vendues. Elles peuvent être traitées par nos sous-traitants
+  techniques (hébergeur, service d'envoi d'emails) liés par contrat et soumis au RGPD.
+</p>
+
+<h2>7. Transferts hors UE</h2>
+<p>
+  Si certains prestataires sont situés hors Union européenne, les transferts sont encadrés par
+  des Clauses Contractuelles Types ou un mécanisme équivalent.
+</p>
+
+<h2>8. Vos droits</h2>
+<p>Vous disposez à tout moment des droits suivants :</p>
+<ul>
+  <li>Droit d'accès, de rectification, d'effacement.</li>
+  <li>Droit à la limitation et à la portabilité.</li>
+  <li>Droit d'opposition.</li>
+  <li>Droit de retirer votre consentement.</li>
+  <li>Droit d'introduire une réclamation auprès de la CNIL (<a href="https://www.cnil.fr" target="_blank" rel="noopener">cnil.fr</a>).</li>
+</ul>
+<p>
+  Pour exercer vos droits : <a href="mailto:contact@example.com">contact@example.com</a>
+  ou via la <a href="{{ url_for('legal.contact') }}">page contact</a>.
+</p>
+
+<h2>9. Sécurité</h2>
+<p>
+  Mots de passe hachés, connexion en HTTPS, protection CSRF, en-têtes de sécurité, journalisation
+  des accès, sauvegardes régulières. Aucun système n'étant infaillible, nous vous recommandons
+  d'utiliser un mot de passe unique et fort.
+</p>
+
+<h2>10. Cookies</h2>
+<p>Voir notre <a href="{{ url_for('legal.cookies') }}">politique cookies</a>.</p>
+{% endblock %}
