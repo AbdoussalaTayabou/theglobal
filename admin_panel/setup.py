@@ -8,7 +8,9 @@ Ajouts :
 - Abonnés newsletter
 """
 import os
+import uuid
 import bleach
+from werkzeug.utils import secure_filename
 from flask import (Flask, redirect, url_for, request, flash, render_template)
 from flask_admin import Admin, AdminIndexView, expose, helpers as admin_helpers
 from flask_admin.contrib.sqla import ModelView
@@ -25,6 +27,22 @@ from models import (db, User, Author, Category, Tag, Article, Media, Pdf,
                     BreakingNews, Comment, Subscriber, Poll, PollOption,
                     PushSubscription, slugify, STATUS_CHOICES)
 from extensions import limiter
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
+def upload_path(*parts):
+    """Chemin absolu vers static/uploads, indépendant du dossier de lancement."""
+    return os.path.join(BASE_DIR, "static", "uploads", *parts)
+
+
+def unique_upload_name(obj, file_data):
+    """Nom de fichier propre et unique pour éviter les collisions/espaces/accents."""
+    original = secure_filename(file_data.filename or "")
+    stem, ext = os.path.splitext(original)
+    stem = slugify(stem or "upload")[:80] or "upload"
+    return f"{stem}-{uuid.uuid4().hex[:12]}{ext.lower()}"
+
 
 # ---------------------------------------------------------------------------
 # Bleach allow-list pour le HTML CKEditor (articles)
@@ -80,10 +98,16 @@ _FILE_SIGNATURES = {
 
 
 def _read_head(file_storage, n=32):
-    pos = file_storage.stream.tell()
-    head = file_storage.stream.read(n)
-    file_storage.stream.seek(pos)
-    return head
+    stream = getattr(file_storage, "stream", file_storage)
+    try:
+        stream.seek(0)
+        head = stream.read(n)
+    finally:
+        try:
+            stream.seek(0)
+        except Exception:
+            pass
+    return head or b""
 
 
 def validate_magic_bytes(form, field):
@@ -189,8 +213,9 @@ class ArticleView(SecureModelView):
     form_extra_fields = {
         "cover_upload": ImageUploadField(
             "Cover (upload)",
-            base_path=os.path.join("static", "uploads", "images"),
+            base_path=upload_path("images"),
             url_relative_path="uploads/images/",
+            namegen=unique_upload_name,
             allowed_extensions=("jpg", "jpeg", "png", "webp", "gif"),
             validators=[validate_magic_bytes],
         ),
@@ -212,6 +237,7 @@ class ArticleView(SecureModelView):
     edit_template = "admin_ck/edit.html"
 
     def on_model_change(self, form, model, is_created):
+        from datetime import datetime
         if not model.slug and model.title:
             model.slug = slugify(model.title)
         # Assainissement du HTML CKEditor avant stockage (anti-XSS)
@@ -220,12 +246,16 @@ class ArticleView(SecureModelView):
         up = getattr(form, "cover_upload", None)
         if up and up.data and hasattr(up.data, "filename") and up.data.filename:
             model.image = f"/static/uploads/images/{up.data.filename}"
-        # Sync legacy "published" flag avec le statut
-        model.published = (model.status == "published")
-        # Si publié sans published_at, on date à maintenant
-        from datetime import datetime
-        if model.status == "published" and not model.published_at:
-            model.published_at = datetime.utcnow()
+        # Réconcilie status <-> published : si l'un OU l'autre indique publié,
+        # on aligne les deux. Évite l'article fantôme (case cochée mais
+        # status resté à "draft" et inversement).
+        if model.status == "published" or model.published:
+            model.status = "published"
+            model.published = True
+            if not model.published_at:
+                model.published_at = datetime.utcnow()
+        else:
+            model.published = False
         # Auteur libre auto-rempli si auteur lié
         if model.author_obj and not model.author:
             model.author = model.author_obj.name
@@ -240,8 +270,9 @@ class AuthorView(SecureModelView):
     form_extra_fields = {
         "photo_upload": ImageUploadField(
             "Photo (upload)",
-            base_path=os.path.join("static", "uploads", "authors"),
+            base_path=upload_path("authors"),
             url_relative_path="uploads/authors/",
+            namegen=unique_upload_name,
             allowed_extensions=("jpg", "jpeg", "png", "webp"),
             validators=[validate_magic_bytes],
         ),
@@ -280,7 +311,8 @@ class MediaView(SecureModelView):
     form_extra_fields = {
         "media_upload": FileUploadField(
             "Fichier (image ou vidéo, optionnel)",
-            base_path=os.path.join("static", "uploads", "media"),
+            base_path=upload_path("media"),
+            namegen=unique_upload_name,
             allowed_extensions=("jpg", "jpeg", "png", "webp", "gif",
                                 "mp4", "webm", "mov"),
             validators=[validate_magic_bytes],
@@ -304,7 +336,8 @@ class PdfView(SecureModelView):
     form_extra_fields = {
         "pdf_upload": FileUploadField(
             "PDF (upload)",
-            base_path=os.path.join("static", "uploads", "pdfs"),
+            base_path=upload_path("pdfs"),
+            namegen=unique_upload_name,
             allowed_extensions=("pdf",),
             validators=[validate_magic_bytes],
         ),
